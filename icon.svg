@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="100" fill="#3D7A5E"/>
+  <ellipse cx="256" cy="300" rx="110" ry="75" fill="#C8B89A"/>
+  <ellipse cx="185" cy="270" rx="82" ry="72" fill="#C8B89A"/>
+  <path d="M362 300 Q410 288 435 308 Q410 322 362 316Z" fill="#C8B89A"/>
+  <ellipse cx="168" cy="250" rx="12" ry="15" fill="#8B7355"/>
+  <ellipse cx="158" cy="265" rx="22" ry="24" fill="#1A1A1A"/>
+  <ellipse cx="161" cy="260" rx="10" ry="12" fill="#D4A800"/>
+  <ellipse cx="161" cy="260" rx="5" ry="10" fill="#1A1A1A"/>
+  <ellipse cx="156" cy="257" rx="5" ry="3" fill="#fff" opacity="0.6"/>
+  <ellipse cx="130" cy="278" rx="18" ry="13" fill="#B8A48A"/>
+  <ellipse cx="124" cy="276" rx="5" ry="3" fill="#8B7355"/>
+  <ellipse cx="136" cy="276" rx="5" ry="3" fill="#8B7355"/>
+  <path d="M128 286 Q145 296 165 290" stroke="#8B7355" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M210 358 Q202 385 190 394 Q200 397 207 389 Q211 400 220 395 Q228 378 222 358Z" fill="#C0AA8A"/>
+  <path d="M300 365 Q292 392 280 401 Q290 404 297 396 Q301 407 310 402 Q318 385 312 365Z" fill="#C0AA8A"/>
+  <ellipse cx="238" cy="275" rx="22" ry="36" fill="#B0A080" opacity="0.45"/>
+  <ellipse cx="282" cy="282" rx="20" ry="34" fill="#B0A080" opacity="0.45"/>
+  <ellipse cx="322" cy="292" rx="18" ry="30" fill="#B0A080" opacity="0.45"/>
+</svg>
