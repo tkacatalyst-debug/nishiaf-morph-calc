@@ -1,36 +1,248 @@
-🦎 ニシアフ モルフ計算機
-♂ オス親
-劣性モルフ
-パターンレス
-オレオ
-アメル
-ゴースト
-パープルヘイズ
-ズールー
-共優性モルフ
-ホワイトアウト
-het（ヘテロ）
-het パターンレス
-het オレオ
-het アメル
-het ゴースト
-het パープルヘイズ
-het ズールー
-♀ メス親
-劣性モルフ
-パターンレス
-オレオ
-アメル
-ゴースト
-パープルヘイズ
-ズールー
-共優性モルフ
-ホワイトアウト
-het（ヘテロ）
-het パターンレス
-het オレオ
-het アメル
-het ゴースト
-het パープルヘイズ
-het ズールー
-確率を計算する
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ニシアフ モルフ計算機</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f4f0;color:#2C2C2A;padding:16px;max-width:700px;margin:0 auto}
+h1{font-size:18px;font-weight:600;text-align:center;margin:16px 0 20px;color:#2C2C2A}
+.parents{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.parent-card{background:#fff;border:1px solid #D3D1C7;border-radius:12px;padding:14px}
+.parent-label{font-size:15px;font-weight:600;margin-bottom:12px;color:#2C2C2A}
+.trait-title{font-size:11px;color:#888780;margin-bottom:6px;font-weight:600;margin-top:10px;text-transform:uppercase;letter-spacing:0.05em}
+.morph-grid{display:flex;flex-wrap:wrap;gap:5px}
+button.mbtn{font-size:12px;padding:6px 10px;border-radius:20px;border:1.5px solid #B4B2A9;background:#F1EFE8;color:#5F5E5A;cursor:pointer;font-family:inherit;transition:all 0.15s}
+button.mbtn:active{transform:scale(0.96)}
+button.hbtn{font-size:11px;padding:4px 9px;border-radius:20px;border:1.5px solid #D3D1C7;background:#fff;color:#888780;cursor:pointer;font-family:inherit;transition:all 0.15s}
+button.hbtn:active{transform:scale(0.96)}
+button.calc{width:100%;padding:13px;border-radius:10px;border:none;background:#3C3489;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:20px;transition:opacity 0.15s}
+button.calc:active{opacity:0.85}
+.results{display:none}
+.summary{background:#fff;border:1px solid #D3D1C7;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:#5F5E5A;line-height:1.5}
+.result-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:10px}
+.rcard{background:#fff;border:1px solid #D3D1C7;border-radius:12px;padding:12px}
+.rmorph{font-size:12px;font-weight:600;color:#2C2C2A;margin-bottom:4px;line-height:1.4}
+.rprob{font-size:24px;font-weight:700;color:#3C3489}
+.rprob span{font-size:14px;font-weight:400;color:#888780}
+.rnote{font-size:11px;color:#B4B2A9;margin-top:4px;line-height:1.5}
+@media(max-width:480px){
+  .parents{grid-template-columns:1fr}
+  h1{font-size:16px}
+}
+</style>
+</head>
+<body>
+<h1>🦎 ニシアフ モルフ計算機</h1>
+
+<div class="parents">
+  <div class="parent-card">
+    <div class="parent-label">♂ オス親</div>
+    <div class="trait-title">劣性モルフ</div>
+    <div class="morph-grid" id="dad-rec"></div>
+    <div class="trait-title">共優性モルフ</div>
+    <div class="morph-grid" id="dad-co"></div>
+    <div class="trait-title">het（ヘテロ）</div>
+    <div class="morph-grid" id="dad-het"></div>
+  </div>
+  <div class="parent-card">
+    <div class="parent-label">♀ メス親</div>
+    <div class="trait-title">劣性モルフ</div>
+    <div class="morph-grid" id="mom-rec"></div>
+    <div class="trait-title">共優性モルフ</div>
+    <div class="morph-grid" id="mom-co"></div>
+    <div class="trait-title">het（ヘテロ）</div>
+    <div class="morph-grid" id="mom-het"></div>
+  </div>
+</div>
+
+<button class="calc" id="calc-btn">確率を計算する</button>
+
+<div class="results" id="results">
+  <div class="summary" id="summary"></div>
+  <div class="result-grid" id="result-grid"></div>
+</div>
+
+<script>
+const RECESSIVE = ["パターンレス","オレオ","アメル","ゴースト","パープルヘイズ","ズールー"];
+const CO_DOM = ["ホワイトアウト"];
+
+const state = {
+  dad:{rec:new Set(),co:new Set(),het:new Set()},
+  mom:{rec:new Set(),co:new Set(),het:new Set()}
+};
+
+const ON_REC  = {background:"#3C3489",color:"#fff",borderColor:"#3C3489"};
+const OFF_REC = {background:"#F1EFE8",color:"#5F5E5A",borderColor:"#B4B2A9"};
+const ON_CO   = {background:"#0F6E56",color:"#fff",borderColor:"#0F6E56"};
+const OFF_CO  = {background:"#F1EFE8",color:"#5F5E5A",borderColor:"#B4B2A9"};
+const ON_HET  = {background:"#185FA5",color:"#fff",borderColor:"#185FA5"};
+const OFF_HET = {background:"#fff",color:"#888780",borderColor:"#D3D1C7"};
+
+function applyStyle(el, s){
+  el.style.background = s.background;
+  el.style.color = s.color;
+  el.style.borderColor = s.borderColor;
+}
+
+function buildParent(p){
+  const recDiv = document.getElementById(`${p}-rec`);
+  const coDiv  = document.getElementById(`${p}-co`);
+  const hetDiv = document.getElementById(`${p}-het`);
+  const hetBtns = {};
+
+  RECESSIVE.forEach(morph => {
+    const b = document.createElement("button");
+    b.textContent = morph;
+    b.className = "mbtn";
+    applyStyle(b, OFF_REC);
+    b.addEventListener("click", function(){
+      if(state[p].rec.has(morph)){
+        state[p].rec.delete(morph);
+        applyStyle(this, OFF_REC);
+      } else {
+        state[p].rec.add(morph);
+        applyStyle(this, ON_REC);
+        if(state[p].het.has(morph)){
+          state[p].het.delete(morph);
+          applyStyle(hetBtns[morph], OFF_HET);
+        }
+      }
+    });
+    recDiv.appendChild(b);
+  });
+
+  CO_DOM.forEach(morph => {
+    const b = document.createElement("button");
+    b.textContent = morph;
+    b.className = "mbtn";
+    applyStyle(b, OFF_CO);
+    b.addEventListener("click", function(){
+      if(state[p].co.has(morph)){
+        state[p].co.delete(morph);
+        applyStyle(this, OFF_CO);
+      } else {
+        state[p].co.add(morph);
+        applyStyle(this, ON_CO);
+      }
+    });
+    coDiv.appendChild(b);
+  });
+
+  RECESSIVE.forEach(morph => {
+    const b = document.createElement("button");
+    b.textContent = "het " + morph;
+    b.className = "hbtn";
+    b.dataset.morph = morph;
+    applyStyle(b, OFF_HET);
+    hetBtns[morph] = b;
+    b.addEventListener("click", function(){
+      if(state[p].rec.has(morph)) return;
+      if(state[p].het.has(morph)){
+        state[p].het.delete(morph);
+        applyStyle(this, OFF_HET);
+      } else {
+        state[p].het.add(morph);
+        applyStyle(this, ON_HET);
+      }
+    });
+    hetDiv.appendChild(b);
+  });
+}
+
+function getAlleles(p, morph){
+  if(state[p].rec.has(morph)) return ["m","m"];
+  if(state[p].het.has(morph)) return ["M","m"];
+  return ["M","M"];
+}
+
+function cross2(a, b){
+  const out = [];
+  a.forEach(x => b.forEach(y => out.push([x,y].sort().join(""))));
+  return out;
+}
+
+function calculate(){
+  const dadWo = state.dad.co.has("ホワイトアウト") ? 1 : 0;
+  const momWo = state.mom.co.has("ホワイトアウト") ? 1 : 0;
+  const woKids = cross2(
+    [...Array(dadWo).fill("W"),...Array(2-dadWo).fill("w")],
+    [...Array(momWo).fill("W"),...Array(2-momWo).fill("w")]
+  );
+
+  const resultMap = {};
+
+  function enumerate(idx, visArr, hetArr, weight){
+    if(idx === RECESSIVE.length){
+      woKids.forEach(woG => {
+        const wc = (woG.match(/W/g)||[]).length;
+        const visParts = [];
+        if(wc === 2) visParts.push("スーパーホワイトアウト");
+        else if(wc === 1) visParts.push("ホワイトアウト");
+        visArr.forEach(m => visParts.push(m));
+        const visKey = visParts.length ? visParts.join(" ") : "ノーマル";
+        const hetKey = hetArr.length ? hetArr.map(m => "het "+m).join(" / ") : "";
+        const key = visKey + "|||" + hetKey;
+        resultMap[key] = (resultMap[key]||0) + weight / woKids.length;
+      });
+      return;
+    }
+    const morph = RECESSIVE[idx];
+    const da = getAlleles("dad", morph);
+    const ma = getAlleles("mom", morph);
+    const kids = cross2(da, ma);
+    const byG = {};
+    kids.forEach(g => { byG[g] = (byG[g]||0)+1; });
+    Object.entries(byG).forEach(([g, c]) => {
+      if(g === "mm") enumerate(idx+1, [...visArr,morph], hetArr, weight*c/4);
+      else if(g === "Mm") enumerate(idx+1, visArr, [...hetArr,morph], weight*c/4);
+      else enumerate(idx+1, visArr, hetArr, weight*c/4);
+    });
+  }
+
+  enumerate(0, [], [], 1);
+
+  const sorted = Object.entries(resultMap)
+    .map(([k, prob]) => {
+      const [vis, het] = k.split("|||");
+      return {vis, het, pct: Math.round(prob*10000)/100};
+    })
+    .filter(r => r.pct >= 0.1)
+    .sort((a,b) => b.pct - a.pct);
+
+  const grid = document.getElementById("result-grid");
+  grid.innerHTML = "";
+  document.getElementById("results").style.display = "block";
+
+  function parentLabel(p){
+    const parts = [];
+    state[p].co.forEach(m => parts.push(m));
+    state[p].rec.forEach(m => parts.push(m));
+    state[p].het.forEach(m => parts.push("het "+m));
+    return parts.length ? parts.join(" ") : "ノーマル";
+  }
+  document.getElementById("summary").textContent =
+    parentLabel("dad") + " × " + parentLabel("mom") + " の子供の出現確率";
+
+  sorted.forEach(r => {
+    const card = document.createElement("div");
+    card.className = "rcard";
+    card.innerHTML =
+      `<div class="rmorph">${r.vis}</div>` +
+      `<div class="rprob">${r.pct.toFixed(1)}<span>%</span></div>` +
+      (r.het ? `<div class="rnote">${r.het}</div>` : "");
+    grid.appendChild(card);
+  });
+
+  if(grid.children.length === 0){
+    grid.innerHTML = `<div style="padding:20px;text-align:center;color:#888;font-size:14px">モルフを選択してください</div>`;
+  }
+}
+
+buildParent("dad");
+buildParent("mom");
+document.getElementById("calc-btn").addEventListener("click", calculate);
+</script>
+</body>
+</html>
